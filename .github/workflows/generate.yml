@@ -1,16 +1,16 @@
 name: Generate Blog
 
 on:
-  workflow_dispatch:   # lancement manuel depuis GitHub
+  workflow_dispatch:   # lancement manuel
   schedule:
-    - cron: "0 */6 * * *"   # toutes les 6 heures (optionnel)
+    - cron: "0 */6 * * *"   # toutes les 6h (optionnel)
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Récupérer le code
+      # 1. Récupérer le repo
       - name: Checkout repo
         uses: actions/checkout@v4
 
@@ -24,18 +24,23 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      # 4. Lancer ton script
+      # 4. Lancer ton générateur
       - name: Run generator
         env:
           SUPA_URL: ${{ secrets.SUPA_URL }}
           SUPA_KEY: ${{ secrets.SUPA_KEY }}
         run: python generate_blog.py
 
-      # 5. Commit des fichiers générés
+      # 5. Commit SAFE des fichiers générés
       - name: Commit blog files
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add blog/
-          git commit -m "update blog" || echo "no changes"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "🟡 No changes to commit"
+          else
+            git commit -m "update blog"
+            git push
+          fi
