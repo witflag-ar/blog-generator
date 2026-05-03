@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{title}} | witflag</title>
+<meta name="description" content="{{meta_description}}">
+<meta name="author" content="{{author}}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://witflag.com/blog/{{slug}}.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://witflag.com/blog/{{slug}}.html">
+<meta property="og:title" content="{{title}} | witflag">
+<meta property="og:description" content="{{meta_description}}">
+<meta property="og:image" content="{{featured_image}}">
+<meta property="og:locale" content="ar_AR">
+<meta property="og:site_name" content="witflag">
+<meta property="article:published_time" content="{{published_at_iso}}">
+<meta property="article:author" content="{{author}}">
+<meta property="article:tag" content="{{tags}}">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{title}} | witflag">
+<meta name="twitter:description" content="{{meta_description}}">
+<meta name="twitter:image" content="{{featured_image}}">
+
+<!-- Schema.org Article -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{title}}",
+  "description": "{{meta_description}}",
+  "image": "{{featured_image}}",
+  "author": {
+    "@type": "Person",
+    "name": "{{author}}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "witflag",
+    "logo": { "@type": "ImageObject", "url": "https://witflag.com/logo.png" }
+  },
+  "datePublished": "{{published_at_iso}}",
+  "dateModified": "{{updated_at_iso}}",
+  "mainEntityOfPage": "https://witflag.com/blog/{{slug}}.html",
+  "inLanguage": "ar",
+  "keywords": "{{tags}}"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════
+   TOKENS — inherits witflag design system
+═══════════════════════════════════════════ */
+:root {
+  --gold:#C9A84C; --gold-l:#E8C97A; --gold-d:#8B6B28; --gold-g:rgba(201,168,76,.13);
+  --green:#00D26A; --red:#FF453A; --blue:#0A84FF;
+  --bg:#0C0C0E; --s1:#141418; --s2:#1E1E24; --s3:#2A2A32;
+  --t1:#F5F3EE; --t2:#9B968A; --t3:#5C5750;
+  --border:rgba(201,168,76,.15); --bdim:rgba(255,255,255,.07);
+  --sh:0 8px 32px rgba(0,0,0,.5); --shb:0 20px 60px rgba(0,0,0,.6);
+  --r:14px; --ease:cubic-bezier(.25,.46,.45,.94);
+  --article-max: 760px;
+}
+[data-theme=light] {
+  --bg:#FAFAF8; --s1:#F0EDE6; --s2:#E5E0D5; --s3:#D8D2C4;
+  --t1:#1A1816; --t2:#6B6560; --t3:#9B9690;
+  --border:rgba(139,107,40,.2); --bdim:rgba(0,0,0,.08);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
+html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased }
+body {
+  font-family:'IBM Plex Sans Arabic', sans-serif;
+  background:var(--bg); color:var(--t1);
+  min-height:100vh; overflow-x:hidden; direction:rtl;
+  transition:background .35s, color .35s;
+}
+a { text-decoration:none; color:inherit }
+button { cursor:pointer; font-family:inherit }
+::-webkit-scrollbar { width:5px }
+::-webkit-scrollbar-track { background:var(--s1) }
+::-webkit-scrollbar-thumb { background:var(--gold-d); border-radius:3px }
+
+/* ── READING PROGRESS BAR ── */
+#readProgress {
+  position:fixed; top:0; right:0; left:0; height:3px; z-index:999;
+  background:var(--s3); transform-origin:right;
+}
+#readProgress::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, var(--gold-d), var(--gold-l));
+  transform-origin:right; transform:scaleX(var(--progress,0));
+  transition:transform .1s linear;
+}
+
+/* ── NAV ── */
+.nav {
+  position:sticky; top:0; z-index:200;
+  background:rgba(12,12,14,.93); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:60px; display:flex; align-items:center;
+  padding:0 5%; gap:16px;
+}
+[data-theme=light] .nav { background:rgba(250,250,248,.93) }
+.logo {
+  font:1.7rem/1 'Playfair Display', serif; font-weight:900; font-style:italic;
+  color:var(--t1); letter-spacing:-.02em; cursor:pointer;
+}
+.logo span { color:var(--gold) }
+.logo:hover { color:var(--gold) }
+.nav-back {
+  display:flex; align-items:center; gap:7px;
+  font:.75rem/1 'IBM Plex Mono', monospace; font-weight:600;
+  color:var(--t3); text-transform:uppercase; letter-spacing:.1em;
+  border:1.5px solid var(--bdim); border-radius:50px;
+  padding:7px 14px; margin-right:auto; transition:all .2s;
+}
+.nav-back:hover { border-color:var(--gold); color:var(--gold) }
+.theme-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--s2); border:1.5px solid var(--bdim);
+  color:var(--t1); display:flex; align-items:center; justify-content:center;
+  font-size:.95rem; transition:all .2s;
+}
+.theme-btn:hover { border-color:var(--gold); color:var(--gold) }
+
+/* ── HERO ── */
+.article-hero {
+  position:relative; width:100%; min-height:520px;
+  display:flex; align-items:flex-end; overflow:hidden;
+}
+.hero-img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  filter:brightness(.45) saturate(.8);
+}
+.hero-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(12,12,14,.98) 0%, rgba(12,12,14,.5) 50%, transparent 100%);
+}
+.hero-content {
+  position:relative; z-index:2; width:100%;
+  max-width:1200px; margin:0 auto; padding:60px 5% 50px;
+}
+.hero-category {
+  display:inline-flex; align-items:center; gap:6px;
+  font:.63rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold); border:1px solid var(--gold-d);
+  background:var(--gold-g); border-radius:4px; padding:4px 10px;
+  margin-bottom:20px;
+}
+.hero-title {
+  font:clamp(2rem,5vw,3.6rem)/1.1 'Playfair Display', serif;
+  font-weight:900; color:#fff; margin-bottom:24px;
+  max-width:800px; text-shadow:0 2px 20px rgba(0,0,0,.5);
+}
+.hero-meta {
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+}
+.meta-author {
+  display:flex; align-items:center; gap:10px;
+}
+.author-avatar {
+  width:38px; height:38px; border-radius:50%;
+  border:2px solid var(--gold); object-fit:cover;
+  background:var(--s3); display:flex; align-items:center;
+  justify-content:center; font-size:1.1rem; overflow:hidden;
+  flex-shrink:0;
+}
+.author-info { display:flex; flex-direction:column; gap:2px }
+.author-name { font:.82rem/1 inherit; font-weight:700; color:#fff }
+.author-title-sm { font:.65rem/1 'IBM Plex Mono', monospace; color:rgba(255,255,255,.45) }
+.meta-sep { width:1px; height:28px; background:rgba(255,255,255,.15) }
+.meta-item {
+  display:flex; align-items:center; gap:5px;
+  font:.7rem/1 'IBM Plex Mono', monospace; color:rgba(255,255,255,.5);
+}
+.meta-item strong { color:rgba(255,255,255,.8); font-weight:600 }
+
+/* ── LAYOUT ── */
+.article-layout {
+  max-width:1200px; margin:0 auto; padding:48px 5%;
+  display:grid; grid-template-columns:1fr 300px; gap:48px;
+  align-items:start;
+}
+@media(max-width:900px) {
+  .article-layout { grid-template-columns:1fr; gap:32px }
+  .sidebar { order:2 }
+}
+
+/* ── ARTICLE BODY ── */
+.article-body { min-width:0 }
+
+.article-content {
+  font-size:1.05rem; line-height:1.9; color:var(--t2);
+}
+.article-content h2 {
+  font:1.7rem/1.2 'Playfair Display', serif; font-weight:700;
+  color:var(--t1); margin:2.5em 0 .8em;
+  padding-bottom:.5em; border-bottom:1px solid var(--border);
+}
+.article-content h3 {
+  font:1.25rem/1.3 'Playfair Display', serif; font-weight:700;
+  color:var(--t1); margin:2em 0 .6em;
+}
+.article-content p { margin-bottom:1.5em }
+.article-content strong { color:var(--t1); font-weight:700 }
+.article-content em { font-style:italic; color:var(--gold-l) }
+.article-content a { color:var(--gold); border-bottom:1px solid var(--gold-d); transition:color .2s }
+.article-content a:hover { color:var(--gold-l) }
+.article-content ul, .article-content ol {
+  margin:1em 0 1.5em 0; padding-right:1.5em;
+}
+.article-content li { margin-bottom:.5em; line-height:1.7 }
+.article-content ul li::marker { color:var(--gold) }
+
+/* Wide images */
+.article-content figure {
+  margin:2.5em -60px; position:relative;
+}
+@media(max-width:900px) { .article-content figure { margin:2em 0 } }
+.article-content figure img {
+  width:100%; border-radius:var(--r); display:block;
+  box-shadow:var(--shb);
+}
+.article-content figcaption {
+  text-align:center; font:.72rem/1 'IBM Plex Mono', monospace;
+  color:var(--t3); margin-top:10px; padding:0 20px;
+}
+
+/* Blockquote */
+.article-content blockquote {
+  margin:2.5em 0; padding:24px 28px 24px 0;
+  border-right:4px solid var(--gold);
+  background:linear-gradient(90deg, transparent, var(--gold-g));
+  border-radius:0 8px 8px 0; position:relative;
+}
+.article-content blockquote::before {
+  content:'\201C'; position:absolute; top:-10px; right:16px;
+  font:5rem/1 'Playfair Display', serif; color:var(--gold);
+  opacity:.35; line-height:1;
+}
+.article-content blockquote p {
+  font:1.15rem/1.7 'Playfair Display', serif; font-style:italic;
+  color:var(--t1); margin:0;
+}
+.article-content blockquote cite {
+  display:block; margin-top:10px;
+  font:.72rem/1 'IBM Plex Mono', monospace; color:var(--gold);
+  font-style:normal;
+}
+
+/* Inline code */
+.article-content code {
+  font-family:'IBM Plex Mono', monospace; font-size:.85em;
+  background:var(--s2); color:var(--gold-l);
+  padding:2px 6px; border-radius:4px;
+  border:1px solid var(--bdim);
+}
+.article-content pre {
+  background:var(--s2); border:1px solid var(--bdim);
+  border-radius:var(--r); padding:20px; overflow-x:auto;
+  margin:2em 0;
+}
+.article-content pre code { background:none; border:none; padding:0 }
+
+/* Highlight box */
+.article-content .highlight-box {
+  background:var(--gold-g); border:1px solid var(--gold-d);
+  border-radius:var(--r); padding:20px 24px; margin:2em 0;
+}
+.article-content .highlight-box p { color:var(--t1); margin:0 }
+
+/* ── DISCLAIMER ── */
+.disclaimer {
+  background:var(--s2); border:1px solid var(--bdim);
+  border-right:3px solid var(--t3);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:16px 20px; margin:2.5em 0;
+  display:flex; align-items:flex-start; gap:12px;
+}
+.disclaimer-ico { font-size:1.1rem; flex-shrink:0; margin-top:2px }
+.disclaimer p {
+  font:.78rem/1.6 'IBM Plex Sans Arabic', sans-serif;
+  color:var(--t3); margin:0;
+}
+.disclaimer strong { color:var(--t2); display:block; margin-bottom:3px }
+
+/* ── TAGS ── */
+.tags-row {
+  display:flex; flex-wrap:wrap; gap:8px;
+  margin:2.5em 0; padding-top:2em; border-top:1px solid var(--bdim);
+}
+.tag {
+  font:.65rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  background:var(--s2); border:1.5px solid var(--bdim);
+  color:var(--t3); padding:5px 12px; border-radius:50px;
+  transition:all .2s;
+}
+.tag:hover { border-color:var(--gold); color:var(--gold) }
+
+/* ── SHARE ROW ── */
+.share-row {
+  display:flex; align-items:center; gap:14px;
+  padding:24px 0; border-top:1px solid var(--bdim); flex-wrap:wrap;
+}
+.share-lbl {
+  font:.65rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--t3);
+}
+.share-btns { display:flex; gap:10px }
+.share-btn {
+  width:40px; height:40px; border-radius:50%; border:1.5px solid var(--bdim);
+  background:var(--s2); color:var(--t2); display:flex;
+  align-items:center; justify-content:center; font-size:1rem;
+  transition:all .25s; position:relative; overflow:hidden;
+}
+.share-btn::before {
+  content:''; position:absolute; inset:0; background:var(--gold-g);
+  opacity:0; transition:opacity .2s;
+}
+.share-btn:hover { border-color:var(--gold); color:var(--gold) }
+.share-btn:hover::before { opacity:1 }
+.share-btn.done { border-color:var(--green); color:var(--green); background:rgba(0,210,106,.08) }
+.share-btn svg { width:16px; height:16px; fill:currentColor; position:relative; z-index:1 }
+
+/* ── AUTHOR BIO ── */
+.author-bio {
+  background:var(--s1); border:1px solid var(--border);
+  border-radius:var(--r); padding:28px; margin:3em 0;
+  display:flex; gap:20px; align-items:flex-start;
+}
+.bio-avatar {
+  width:64px; height:64px; border-radius:50%; flex-shrink:0;
+  border:2px solid var(--gold); background:var(--s3);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem; overflow:hidden;
+}
+.bio-avatar img { width:100%; height:100%; object-fit:cover }
+.bio-content { flex:1; min-width:0 }
+.bio-label {
+  font:.6rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:6px;
+}
+.bio-name {
+  font:1.1rem/1 'Playfair Display', serif; font-weight:700;
+  color:var(--t1); margin-bottom:8px;
+}
+.bio-role {
+  font:.72rem/1 'IBM Plex Mono', monospace; color:var(--gold);
+  margin-bottom:10px;
+}
+.bio-text { font:.82rem/1.7 inherit; color:var(--t2) }
+
+/* ── SIDEBAR ── */
+.sidebar { position:sticky; top:80px; display:flex; flex-direction:column; gap:20px }
+
+.sidebar-card {
+  background:var(--s1); border:1px solid var(--bdim);
+  border-radius:var(--r); overflow:hidden;
+}
+.sidebar-head {
+  padding:14px 18px; border-bottom:1px solid var(--bdim);
+  background:var(--s2);
+  font:.63rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+}
+
+/* Related posts */
+.related-list { padding:12px }
+.related-item {
+  display:flex; gap:12px; padding:10px 6px;
+  border-bottom:1px solid var(--bdim); cursor:pointer;
+  transition:background .2s; border-radius:8px;
+}
+.related-item:last-child { border-bottom:none }
+.related-item:hover { background:var(--s2) }
+.rel-thumb {
+  width:58px; height:58px; border-radius:8px; flex-shrink:0;
+  object-fit:cover; background:var(--s3);
+}
+.rel-info { flex:1; min-width:0 }
+.rel-cat {
+  font:.58rem/1 'IBM Plex Mono', monospace; color:var(--gold);
+  text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px;
+}
+.rel-title {
+  font:.78rem/1.4 'Playfair Display', serif; font-weight:700;
+  color:var(--t1); overflow:hidden;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.rel-date { font:.6rem/1 'IBM Plex Mono', monospace; color:var(--t3); margin-top:4px }
+.related-loading { padding:24px; text-align:center; color:var(--t3); font-size:.8rem }
+
+/* Social sidebar */
+.social-sidebar { padding:16px }
+.social-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+.social-card {
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:var(--s2); border:1.5px solid var(--bdim);
+  border-radius:10px; padding:12px 8px; cursor:pointer;
+  transition:all .2s; text-decoration:none;
+}
+.social-card:hover { transform:translateY(-2px); box-shadow:var(--sh) }
+.social-card.ig:hover { border-color:#E1306C; background:rgba(225,48,108,.08) }
+.social-card.fb:hover { border-color:#1877F2; background:rgba(24,119,242,.08) }
+.social-card.x:hover  { border-color:#fff; background:rgba(255,255,255,.05) }
+.social-card.pi:hover { border-color:#E60023; background:rgba(230,0,35,.08) }
+.social-card svg { width:20px; height:20px }
+.social-card span { font:.62rem/1 'IBM Plex Mono', monospace; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--t3) }
+.social-card .followers { font:.58rem/1 inherit; color:var(--t3) }
+
+/* Table of contents */
+.toc-list { padding:10px 16px; list-style:none }
+.toc-item { padding:6px 0; border-bottom:1px solid var(--bdim) }
+.toc-item:last-child { border-bottom:none }
+.toc-link {
+  font:.78rem/1.4 inherit; color:var(--t2); transition:color .2s;
+  display:flex; align-items:center; gap:8px;
+}
+.toc-link::before {
+  content:''; width:4px; height:4px; border-radius:50%;
+  background:var(--gold-d); flex-shrink:0;
+}
+.toc-link:hover, .toc-link.active { color:var(--gold) }
+.toc-link.active::before { background:var(--gold) }
+
+/* ── FLOATING SOCIAL (mobile) ── */
+.float-social {
+  position:fixed; left:0; top:50%; transform:translateY(-50%);
+  display:flex; flex-direction:column; gap:8px;
+  padding:10px 8px; z-index:150;
+  background:var(--s1); border:1px solid var(--bdim);
+  border-radius:0 var(--r) var(--r) 0;
+  border-left:none; box-shadow:var(--sh);
+  transition:opacity .3s; opacity:0; pointer-events:none;
+}
+.float-social.visible { opacity:1; pointer-events:auto }
+.float-btn {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--s2); border:1.5px solid var(--bdim);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all .25s; position:relative;
+}
+.float-btn svg { width:16px; height:16px; fill:currentColor; color:var(--t2) }
+.float-btn:hover svg { color:var(--gold) }
+.float-btn:hover { border-color:var(--gold) }
+.float-btn.done { border-color:var(--green) }
+.float-btn.done svg { color:var(--green) }
+.float-btn.hidden-btn { display:none }
+
+/* Tooltip */
+.float-btn::after {
+  content:attr(data-label); position:absolute; left:calc(100% + 8px);
+  background:var(--s2); color:var(--t1); font:.65rem/1 inherit;
+  font-weight:700; white-space:nowrap; padding:5px 9px;
+  border-radius:6px; border:1px solid var(--bdim);
+  opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.float-btn:hover::after { opacity:1 }
+
+/* ── FOOTER ── */
+.footer {
+  background:var(--s1); border-top:1px solid var(--bdim);
+  margin-top:40px; padding:28px 5%;
+  display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:16px;
+}
+.footer-copy { font:.72rem/1 'IBM Plex Mono', monospace; color:var(--t3) }
+.footer-copy a { color:var(--gold); transition:color .2s }
+.footer-copy a:hover { color:var(--gold-l) }
+.footer-back-home {
+  display:flex; align-items:center; gap:7px;
+  font:.75rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  color:var(--gold); border:1.5px solid var(--gold-d);
+  border-radius:50px; padding:8px 18px; transition:all .2s;
+}
+.footer-back-home:hover { background:var(--gold-g) }
+
+/* ── NEXT/PREV NAV ── */
+.article-nav {
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  margin:3em 0;
+}
+@media(max-width:600px) { .article-nav { grid-template-columns:1fr } }
+.art-nav-card {
+  background:var(--s1); border:1.5px solid var(--bdim);
+  border-radius:var(--r); padding:18px 20px; cursor:pointer;
+  transition:all .25s;
+}
+.art-nav-card:hover { border-color:var(--gold); background:var(--gold-g) }
+.art-nav-dir {
+  font:.6rem/1 'IBM Plex Mono', monospace; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--t3); margin-bottom:8px;
+}
+.art-nav-title {
+  font:.9rem/1.4 'Playfair Display', serif; font-weight:700; color:var(--t1)
+}
+
+/* ── UTILITIES ── */
+.state-msg { text-align:center; padding:32px; color:var(--t3); font-size:.85rem }
+@media(max-width:600px) {
+  .article-hero { min-height:360px }
+  .hero-title { font-size:1.8rem }
+  .author-bio { flex-direction:column }
+  .article-content figure { margin:2em 0 }
+}
+</style>
+</head>
+<body>
+
+<!-- READING PROGRESS -->
+<div id="readProgress"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="https://witflag.com" class="logo">wit<span>flag</span></a>
+  <a href="https://witflag.com" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    العودة للرئيسية
+  </a>
+  <button class="theme-btn" onclick="toggleTheme()" title="تغيير المظهر">🌙</button>
+</nav>
+
+<!-- HERO -->
+<header class="article-hero">
+  <img class="hero-img" src="{{featured_image}}" alt="{{title}}" loading="eager">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-category">{{category}}</div>
+    <h1 class="hero-title">{{title}}</h1>
+    <div class="hero-meta">
+      <div class="meta-author">
+        <div class="author-avatar">{{author_avatar_html}}</div>
+        <div class="author-info">
+          <span class="author-name">{{author}}</span>
+          <span class="author-title-sm">{{author_role}}</span>
+        </div>
+      </div>
+      <div class="meta-sep"></div>
+      <div class="meta-item">
+        <span>📅</span>
+        <strong>{{published_at_display}}</strong>
+      </div>
+      <div class="meta-sep"></div>
+      <div class="meta-item">
+        <span>⏱</span>
+        <strong>{{read_time}} دقائق قراءة</strong>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- FLOATING SOCIAL (appears after scroll) -->
+<div class="float-social" id="floatSocial">
+  <button class="float-btn" id="flt-ig" data-platform="ig" data-label="Instagram" onclick="handleShare('ig')">
+    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+  </button>
+  <button class="float-btn" id="flt-fb" data-platform="fb" data-label="Facebook" onclick="handleShare('fb')">
+    <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+  </button>
+  <button class="float-btn" id="flt-x" data-platform="x" data-label="X / Twitter" onclick="handleShare('x')">
+    <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+  </button>
+  <button class="float-btn" id="flt-pi" data-platform="pi" data-label="Pinterest" onclick="handleShare('pi')">
+    <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+  </button>
+</div>
+
+<!-- MAIN LAYOUT -->
+<main class="article-layout">
+
+  <!-- ARTICLE BODY -->
+  <article class="article-body">
+
+    <!-- ARTICLE CONTENT — Python injects full HTML here -->
+    <div class="article-content" id="articleContent">
+      {{content}}
+
+      <!-- DISCLAIMER — always present at end of content -->
+      <div class="disclaimer">
+        <span class="disclaimer-ico">ℹ️</span>
+        <p>
+          <strong>تنبيه وإخلاء مسؤولية</strong>
+          نسعى دائمًا إلى تقديم معلومات دقيقة ومحدَّثة، غير أنّ witflag لا تضمن بشكل مطلق صحة جميع البيانات الواردة في هذه الصفحة أو اكتمالها. قد تتغيّر المواصفات والأسعار والتوافر في أي وقت دون إشعار مسبق. يُنصح بالتحقق من المصادر الرسمية قبل اتخاذ أي قرار شرائي.
+        </p>
+      </div>
+    </div>
+
+    <!-- TAGS -->
+    <div class="tags-row" id="tagsRow">
+      <!-- Populated by JS from {{tags_json}} -->
+    </div>
+
+    <!-- SHARE ROW -->
+    <div class="share-row">
+      <span class="share-lbl">شارك المقال</span>
+      <div class="share-btns">
+        <button class="share-btn" id="share-ig" onclick="handleShare('ig')" title="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </button>
+        <button class="share-btn" id="share-fb" onclick="handleShare('fb')" title="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </button>
+        <button class="share-btn" id="share-x" onclick="handleShare('x')" title="X / Twitter">
+          <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </button>
+        <button class="share-btn" id="share-pi" onclick="handleShare('pi')" title="Pinterest">
+          <svg viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PREV / NEXT -->
+    <nav class="article-nav" id="articleNav" aria-label="تصفح المقالات"></nav>
+
+    <!-- AUTHOR BIO -->
+    <div class="author-bio">
+      <div class="bio-avatar">{{author_avatar_html}}</div>
+      <div class="bio-content">
+        <div class="bio-label">كاتب المقال</div>
+        <div class="bio-name">{{author}}</div>
+        <div class="bio-role">{{author_role}}</div>
+        <p class="bio-text">{{author_bio}}</p>
+      </div>
+    </div>
+
+  </article>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="sidebar-card" id="tocCard">
+      <div class="sidebar-head">📋 محتويات المقال</div>
+      <ul class="toc-list" id="tocList"></ul>
+    </div>
+
+    <!-- RELATED POSTS -->
+    <div class="sidebar-card">
+      <div class="sidebar-head">📰 مقالات ذات صلة</div>
+      <div id="relatedPosts" class="related-loading">جارٍ التحميل…</div>
+    </div>
+
+    <!-- SOCIAL MEDIA -->
+    <div class="sidebar-card">
+      <div class="sidebar-head">🔗 تابعنا</div>
+      <div class="social-sidebar">
+        <div class="social-grid">
+          <a href="https://instagram.com/witflag" target="_blank" rel="noopener" class="social-card ig">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="color:#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <span>Instagram</span>
+          </a>
+          <a href="https://facebook.com/witflag" target="_blank" rel="noopener" class="social-card fb">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="color:#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span>Facebook</span>
+          </a>
+          <a href="https://x.com/witflag" target="_blank" rel="noopener" class="social-card x">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <span>X / Twitter</span>
+          </a>
+          <a href="https://pinterest.com/witflag" target="_blank" rel="noopener" class="social-card pi">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="color:#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+            <span>Pinterest</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-copy">
+    © 2025 <a href="https://witflag.com">witflag</a> — جميع الحقوق محفوظة
+  </div>
+  <a href="https://witflag.com" class="footer-back-home">
+    العودة إلى الرئيسية
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </a>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG — injected by Python generate_blog.py
+═══════════════════════════════════════════ */
+const SUPA_URL = 'https://lwstiqtxgytlcsouojdc.supabase.co';
+const SUPA_KEY = '{{supa_anon_key}}'; // ← Python injecte la clé anon ici
+const CURRENT_SLUG    = '{{slug}}';
+const CURRENT_CATEGORY = '{{category}}';
+const TAGS_JSON       = {{tags_json}}; // ex: ["Samsung","Android","Flagship"]
+const PAGE_URL        = 'https://witflag.com/blog/{{slug}}.html';
+const PAGE_TITLE      = '{{title}}';
+const PAGE_IMAGE      = '{{featured_image}}';
+
+/* ═══════════════════════════════════════════
+   READING PROGRESS
+═══════════════════════════════════════════ */
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('readProgress');
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? window.scrollY / total : 0;
+  el.style.setProperty('--progress', pct);
+
+  // Show floating social after 20% scroll
+  document.getElementById('floatSocial').classList.toggle('visible', pct > 0.2);
+}, { passive: true });
+
+/* ═══════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════ */
+function toggleTheme() {
+  const d = document.documentElement;
+  const next = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  d.setAttribute('data-theme', next);
+  localStorage.setItem('wf_theme', next);
+  document.querySelector('.theme-btn').textContent = next === 'dark' ? '🌙' : '☀️';
+}
+(function() {
+  const saved = localStorage.getItem('wf_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.querySelector('.theme-btn').textContent = saved === 'dark' ? '🌙' : '☀️';
+})();
+
+/* ═══════════════════════════════════════════
+   SHARE / SOCIAL — localStorage tracks clicks
+═══════════════════════════════════════════ */
+const SHARE_URLS = {
+  ig: `https://www.instagram.com/`,  // IG doesn't support direct share URL — opens profile
+  fb: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(PAGE_URL)}`,
+  x:  `https://twitter.com/intent/tweet?url=${encodeURIComponent(PAGE_URL)}&text=${encodeURIComponent(PAGE_TITLE)}`,
+  pi: `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(PAGE_URL)}&media=${encodeURIComponent(PAGE_IMAGE)}&description=${encodeURIComponent(PAGE_TITLE)}`
+};
+
+function getSharedKey(platform) {
+  return `wf_shared_${platform}_${CURRENT_SLUG}`;
+}
+
+function handleShare(platform) {
+  window.open(SHARE_URLS[platform], '_blank', 'noopener,width=600,height=500');
+  localStorage.setItem(getSharedKey(platform), '1');
+  markShared(platform);
+}
+
+function markShared(platform) {
+  // Mark in share row
+  const btn = document.getElementById(`share-${platform}`);
+  if (btn) btn.classList.add('done');
+  // Mark in floating bar
+  const flt = document.getElementById(`flt-${platform}`);
+  if (flt) flt.classList.add('done');
+}
+
+function initShareState() {
+  ['ig','fb','x','pi'].forEach(p => {
+    if (localStorage.getItem(getSharedKey(p))) markShared(p);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   TAGS
+═══════════════════════════════════════════ */
+function renderTags() {
+  const row = document.getElementById('tagsRow');
+  if (!TAGS_JSON || !TAGS_JSON.length) { row.style.display='none'; return; }
+  row.innerHTML = TAGS_JSON.map(t =>
+    `<a href="https://witflag.com/?q=${encodeURIComponent(t)}" class="tag">#${t}</a>`
+  ).join('');
+}
+
+/* ═══════════════════════════════════════════
+   TABLE OF CONTENTS — auto-generated from h2/h3
+═══════════════════════════════════════════ */
+function buildTOC() {
+  const headings = document.querySelectorAll('.article-content h2, .article-content h3');
+  const list = document.getElementById('tocList');
+  if (headings.length < 2) { document.getElementById('tocCard').style.display='none'; return; }
+
+  headings.forEach((h, i) => {
+    const id = `section-${i}`;
+    h.id = id;
+    const li = document.createElement('li');
+    li.className = 'toc-item';
+    li.innerHTML = `<a href="#${id}" class="toc-link ${h.tagName==='H3'?'toc-sub':''}">${h.textContent}</a>`;
+    if (h.tagName === 'H3') li.style.paddingRight = '12px';
+    list.appendChild(li);
+  });
+
+  // Highlight active section on scroll
+  const links = list.querySelectorAll('.toc-link');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = list.querySelector(`a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+}
+
+/* ═══════════════════════════════════════════
+   RELATED POSTS — fetched from Supabase
+═══════════════════════════════════════════ */
+async function fetchRelated() {
+  const container = document.getElementById('relatedPosts');
+  try {
+    // Fetch by same category first, fallback to latest
+    const url = `${SUPA_URL}/rest/v1/blog_posts`
+      + `?select=title,slug,excerpt,featured_image,published_at,category`
+      + `&status=eq.published`
+      + `&slug=neq.${CURRENT_SLUG}`
+      + (CURRENT_CATEGORY ? `&category=eq.${encodeURIComponent(CURRENT_CATEGORY)}` : '')
+      + `&order=published_at.desc&limit=4`;
+
+    const r = await fetch(url, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+    });
+    let posts = await r.json();
+
+    // If < 2 results from same category, fetch latest overall
+    if (posts.length < 2) {
+      const r2 = await fetch(
+        `${SUPA_URL}/rest/v1/blog_posts?select=title,slug,excerpt,featured_image,published_at,category&status=eq.published&slug=neq.${CURRENT_SLUG}&order=published_at.desc&limit=4`,
+        { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` } }
+      );
+      posts = await r2.json();
+    }
+
+    if (!posts.length) { container.innerHTML = '<div class="state-msg">لا توجد مقالات أخرى حالياً.</div>'; return; }
+
+    container.innerHTML = posts.map(p => {
+      const date = p.published_at ? new Date(p.published_at).toLocaleDateString('ar-MA') : '';
+      return `
+        <a href="/blog/${p.slug}.html" class="related-item">
+          ${p.featured_image
+            ? `<img class="rel-thumb" src="${p.featured_image}" alt="${p.title}" loading="lazy">`
+            : `<div class="rel-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">📱</div>`}
+          <div class="rel-info">
+            ${p.category ? `<div class="rel-cat">${p.category}</div>` : ''}
+            <div class="rel-title">${p.title}</div>
+            ${date ? `<div class="rel-date">${date}</div>` : ''}
+          </div>
+        </a>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="state-msg">تعذر تحميل المقالات.</div>';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PREV / NEXT NAVIGATION — static from Python
+   Python injects this object at build time
+═══════════════════════════════════════════ */
+const ARTICLE_NAV = {{article_nav_json}};
+// Expected format:
+// { prev: { title: "...", slug: "..." }, next: { title: "...", slug: "..." } }
+// Either prev or next can be null
+
+function renderArticleNav() {
+  const nav = document.getElementById('articleNav');
+  if (!ARTICLE_NAV || (!ARTICLE_NAV.prev && !ARTICLE_NAV.next)) {
+    nav.style.display = 'none'; return;
+  }
+  nav.innerHTML = `
+    ${ARTICLE_NAV.prev
+      ? `<a href="/blog/${ARTICLE_NAV.prev.slug}.html" class="art-nav-card">
+           <div class="art-nav-dir">← المقال السابق</div>
+           <div class="art-nav-title">${ARTICLE_NAV.prev.title}</div>
+         </a>`
+      : '<div></div>'}
+    ${ARTICLE_NAV.next
+      ? `<a href="/blog/${ARTICLE_NAV.next.slug}.html" class="art-nav-card" style="text-align:left">
+           <div class="art-nav-dir">المقال التالي ←</div>
+           <div class="art-nav-title">${ARTICLE_NAV.next.title}</div>
+         </a>`
+      : '<div></div>'}
+  `;
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initShareState();
+  renderTags();
+  buildTOC();
+  fetchRelated();
+  renderArticleNav();
+});
+</script>
+</body>
+</html>
